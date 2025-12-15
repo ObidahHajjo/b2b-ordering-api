@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\user\UserController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
@@ -16,4 +17,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
+Route::resource('users', UserController::class)->only(['store', 'update', 'destroy']);
 require __DIR__.'/settings.php';
