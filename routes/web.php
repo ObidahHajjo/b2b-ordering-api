@@ -17,5 +17,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 });
 
-Route::resource('users', UserController::class)->only(['store', 'update', 'destroy']);
+Route::resource('users', UserController::class);
+Route::controller(UserController::class)->group(function () {
+    Route::get('/users', 'index')->name('users.index');
+    Route::get('/users/{hashid}', 'show')->name('users.show');
+    Route::get('/users/edit', 'edit')->name('users.edit')->middleware('admin');
+    Route::put('/users/update', 'update')->name('users.update')->middleware('admin');
+});
+
 require __DIR__.'/settings.php';
