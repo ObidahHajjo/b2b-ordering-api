@@ -13,9 +13,9 @@ class RoleMiddleware
      *
      * @param  \Closure(Request): (Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next): Response
     {
-        if(! auth()->check() || ! auth()->user()->hasRole($role)) {
+        if(! auth()->check() || ! auth()->user()->hasRole('admin')) {
             abort(Response::HTTP_FORBIDDEN);
         }
         return $next($request);
