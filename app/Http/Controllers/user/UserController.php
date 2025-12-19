@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
 use Vinkla\Hashids\Facades\Hashids;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -78,10 +80,13 @@ class UserController extends Controller
      * @return \App\Models\User
      *
      */
-    public function store(StoreUserRequest $request): User
+    public function store(StoreUserRequest $request): RedirectResponse
     {
-        Gate::authorize('create', User::class);
-        return User::create($request->validated());
+        $data = $request->validated();
+        $data['password'] =  Hash::make($data['password']);
+        User::create($data);
+
+        return redirect()->route('users.index');
     }
 
     /**
