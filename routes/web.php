@@ -15,14 +15,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
+
+    Route::prefix('/users')->name('users.')->controller(UserController::class)->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/{hashid}', 'show')->name('show');
+        Route::put('/update', 'update')->name('update')->middleware('admin');
+        Route::post('/', 'store')->name('store');
+    });
 });
 
-Route::resource('users', UserController::class);
-Route::controller(UserController::class)->group(function () {
-    Route::get('/users', 'index')->name('users.index');
-    Route::get('/users/{hashid}', 'show')->name('users.show');
-    Route::get('/users/edit', 'edit')->name('users.edit')->middleware('admin');
-    Route::put('/users/update', 'update')->name('users.update')->middleware('admin');
-});
-
-require __DIR__.'/settings.php';
+require __DIR__ . '/settings.php';
