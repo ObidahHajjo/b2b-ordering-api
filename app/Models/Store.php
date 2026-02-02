@@ -34,15 +34,25 @@ class Store extends Model
         ];
     }
 
+    protected $guarded = ['id'];
+
     /**
      * Get the users associated with this role.
      *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\User>
+     * @return HasMany<User>
      */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
-
+    /**
+     * Get the files associated with this store.
+     *
+     * @return HasMany<File>
+     */
+    public function files() : HasMany
+    {
+        return $this->hasMany(File::class);
+    }
 }
