@@ -81,6 +81,7 @@ class UserController extends Controller
      */
     public function show(string $hashid)
     {
+        //TODO : use userService instead of model
         $id = Hashids::decode($hashid)[0] ?? null;
 
         abort_if(! $id, 404);
@@ -112,6 +113,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): RedirectResponse
     {
+        //TODO : use userService instead of model
         $data = $request->validated();
         $data['password'] =  Hash::make($data['password']);
         User::create($data);
@@ -132,6 +134,7 @@ class UserController extends Controller
      */
     public function update(User $user, UpdateUserRequest $request): bool
     {
+        //TODO : use userService instead of model
         Gate::authorize('update', $user);
         $data = $request->validated();
         return $user->update($data);
@@ -149,6 +152,7 @@ class UserController extends Controller
      */
     public function destroy(User $user): bool|null
     {
+        //TODO : use userService instead of model
         Gate::authorize('delete', $user);
         return $user->delete();
     }
