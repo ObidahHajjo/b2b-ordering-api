@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import CreateUserModal from '@/components/user/CreateUserForm';
 import { useState } from 'react';
+import { Role } from '@/models/Role';
 
 type User = {
     id: string;
@@ -8,11 +9,20 @@ type User = {
     email: string;
 };
 
+
+
 type Props = {
     users: User[];
+    roles: Role[];
+    stores: Store[];
 };
 
-export default function UsersIndex({ users }: Props) {
+type Store = {
+    id: string;
+    name: string;
+}
+
+export default function UsersIndex({ users, roles,stores  }: Props) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -79,6 +89,8 @@ export default function UsersIndex({ users }: Props) {
                     <CreateUserModal
                         open={open}
                         onClose={() => setOpen(false)}
+                        roles={roles}
+                        stores={stores}
                     />
                 </div>
             </div>
