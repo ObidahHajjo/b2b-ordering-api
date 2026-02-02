@@ -29,6 +29,8 @@ class User extends Authenticatable
         'email',
         'password',
         'phone',
+        'role_id',
+        'store_id'
     ];
 
     /**
@@ -43,7 +45,7 @@ class User extends Authenticatable
 
     protected $appends = ['hashid'];
 
-    public function magasin(): BelongsTo
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
