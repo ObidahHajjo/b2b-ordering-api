@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\User;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreUserRequest extends FormRequest
@@ -17,7 +18,7 @@ class StoreUserRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
@@ -29,6 +30,7 @@ class StoreUserRequest extends FormRequest
             'password_confirmation' => 'required|string|min:8',
             'phone' => 'required|string|min:8',
             'role_id' => 'required|integer|exists:roles,id',
+            'store_id' => 'required|integer|exists:stores,id',
         ];
     }
 
@@ -49,6 +51,9 @@ class StoreUserRequest extends FormRequest
             'password.min.8' => 'User password must be at least 8 characters.',
             'password_confirmation.min.8' => 'User confirm password must be at least 8 characters.',
             'password.confirmed' => 'User confirm password must be same as password.',
+            'store_id.required' => 'Store id is required.',
+            'store_id.integer' => 'Store id must be an integer.',
+            'store_id.exists' => 'Store id must be an existing store.',
         ];
     }
 }
