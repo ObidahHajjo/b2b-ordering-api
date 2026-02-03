@@ -16,6 +16,7 @@ class File extends Model
         'name',
         'path',
         'uploaded_at',
+        'store_id'
     ];
 
     protected $guarded = ['id'];

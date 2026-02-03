@@ -12,6 +12,7 @@ class Address extends Model
         'street',
         'number',
         'postal_code',
+        'user_id'
     ];
 
     public function user(): BelongsTo
