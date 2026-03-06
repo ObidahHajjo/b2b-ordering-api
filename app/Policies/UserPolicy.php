@@ -36,7 +36,7 @@ class UserPolicy
      */
     public function update(User $authUser, User $targetUser): bool
     {
-        return $authUser->isAdmin();
+        return $authUser->id === $targetUser->id;
     }
 
     /**
@@ -44,7 +44,8 @@ class UserPolicy
      */
     public function delete(User $authUser, User $targetUser): bool
     {
-        return $authUser->isAdmin();
+        return (($authUser->isAdmin() && !$targetUser->isAdmin())
+            || $authUser->id === $targetUser->id);
     }
 
     /**

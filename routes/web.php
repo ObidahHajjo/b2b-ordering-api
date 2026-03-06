@@ -18,7 +18,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::prefix('/users')->name('users.')->controller(UserController::class)->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::get('/{hashid}', 'show')->name('show');
+        Route::get('/{hashId}', 'show')->name('show');
         Route::put('/update', 'update')->name('update')->middleware('admin');
         Route::post('/', 'store')->name('store');
     });

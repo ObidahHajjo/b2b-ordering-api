@@ -24,11 +24,7 @@ class UserService implements UserInterface
     public function getById(int $id): ?User
     {
         if (empty($id)) return null;
-        try {
-            return $this->userEloquent->getById($id);
-        } catch (ModelNotFoundException) {
-            return null;
-        }
+        return $this->userEloquent->getById($id);
     }
 
     /**
@@ -37,11 +33,7 @@ class UserService implements UserInterface
     public function getByEmail(string $email): ?User
     {
         if (empty($email) || trim($email) == '') return null;
-        try {
-            return $this->userEloquent->getByEmail($email);
-        } catch (ModelNotFoundException) {
-            return null;
-        }
+        return $this->userEloquent->getByEmail($email);
     }
 
     /**
@@ -57,9 +49,9 @@ class UserService implements UserInterface
      */
     public function create(array $attributes): User
     {
-        $required = ['last_name', 'first_name','email','password', 'role_id', 'store_id'];
+        $required = ['last_name', 'first_name', 'email', 'password', 'role_id', 'store_id'];
         $missing = array_diff($required, array_keys($attributes));
-        if(!empty($missing)) throw new MissingAttributesException($missing);
+        if (!empty($missing)) throw new MissingAttributesException($missing);
         return $this->userEloquent->create($attributes);
     }
 

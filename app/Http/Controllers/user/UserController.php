@@ -36,14 +36,15 @@ class UserController extends Controller
      * @param StoreInterface $storeInterface
      * @return Response
      */
-    public function index(RoleInterface $roleInterface, StoreInterface $storeInterface): Response {
+    public function index(RoleInterface $roleInterface, StoreInterface $storeInterface): Response
+    {
         $users = $this->userService
             ->all()
             ->map(function (User $user) {
                 return [
-                    'name'  => $user->first_name . ' ' . $user->last_name,
+                    'name' => $user->first_name . ' ' . $user->last_name,
                     'email' => $user->email,
-                    'id'    => $user->hashid,
+                    'id' => $user->hashid,
                 ];
             });
 
@@ -74,19 +75,20 @@ class UserController extends Controller
      * The user is resolved from a hashed identifier to avoid
      * exposing internal database IDs.
      *
-     * @param  string  $hashid  The hashed user identifier.
+     * @param string $hashid The hashed user identifier.
      * @return Response
      *
      * @throws NotFoundHttpException
      */
-    public function show(string $hashid)
+    public function show(string $hashId)
     {
         //TODO : use userService instead of model
-        $id = Hashids::decode($hashid)[0] ?? null;
+        $decoded = Hashids::decode($hashId);
+        $id = $decoded[0] ?? null;
+        abort_if(!$id, 404);
 
-        abort_if(! $id, 404);
-
-        $user = User::findOrFail($id);
+        $user = $this->userService->getById($id);
+        abort_if(!$user, 404);
 
         return Inertia::render('users/show', [
             'user' => [
@@ -115,10 +117,10 @@ class UserController extends Controller
     {
         //TODO : use userService instead of model
         $data = $request->validated();
-        $data['password'] =  Hash::make($data['password']);
+        $data['password'] = Hash::make($data['password']);
         User::create($data);
 
-        return redirect()->route('users.index');
+        return redirect()->route('users.index')->with('success', 'User created.');
     }
 
     /**
@@ -134,7 +136,6 @@ class UserController extends Controller
      */
     public function update(User $user, UpdateUserRequest $request): bool
     {
-        //TODO : use userService instead of model
         Gate::authorize('update', $user);
         $data = $request->validated();
         return $user->update($data);
