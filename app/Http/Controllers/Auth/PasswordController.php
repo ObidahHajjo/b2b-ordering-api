@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Settings;
+namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
@@ -11,17 +11,31 @@ use Inertia\Response;
 
 class PasswordController extends Controller
 {
-    /**
-     * Show the user's password settings page.
-     */
+    public function forgot(Request $request): Response
+    {
+        return Inertia::render('auth/forgot-password', [
+            'status' => $request->session()->get('status'),
+        ]);
+    }
+
+    public function reset(Request $request): Response
+    {
+        return Inertia::render('auth/reset-password', [
+            'email' => $request->email,
+            'token' => $request->route('token'),
+        ]);
+    }
+
+    public function confirm(): Response
+    {
+        return Inertia::render('auth/confirm-password');
+    }
+
     public function edit(): Response
     {
         return Inertia::render('settings/password');
     }
 
-    /**
-     * Update the user's password.
-     */
     public function update(Request $request): RedirectResponse
     {
         $validated = $request->validate([
