@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Interfaces;
+namespace App\Services\Interfaces;
 
 use App\Exceptions\MissingAttributesException;
 use App\Models\Role;

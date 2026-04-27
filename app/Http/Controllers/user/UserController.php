@@ -5,17 +5,17 @@ namespace App\Http\Controllers\user;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
-use App\Interfaces\RoleInterface;
-use App\Interfaces\StoreInterface;
 use App\Models\User;
-use App\Services\UserService;
+use App\Services\Implements\UserService;
+use App\Services\Interfaces\RoleInterface;
+use App\Services\Interfaces\StoreInterface;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Hash;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Vinkla\Hashids\Facades\Hashids;
-use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {

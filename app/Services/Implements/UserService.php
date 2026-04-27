@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Implements;
 
 use App\Exceptions\MissingAttributesException;
-use App\Interfaces\UserInterface;
-use App\Repositories\Interfaces\UserInterface as UserEloquentInterface;
 use App\Models\User;
+use App\Repositories\Interfaces\UserInterface as UserEloquentInterface;
+use App\Services\Interfaces\UserInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 

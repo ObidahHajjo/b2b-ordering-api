@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Implements;
 
-use App\Repositories\Interfaces\StoreInterface as StoreRepoInterface;
 use App\Exceptions\MissingAttributesException;
-use App\Interfaces\StoreInterface;
 use App\Models\Store;
+use App\Repositories\Interfaces\StoreInterface as StoreRepoInterface;
+use App\Services\Interfaces\StoreInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 

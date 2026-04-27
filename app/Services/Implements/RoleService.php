@@ -1,22 +1,19 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Implements;
 
-use App\Repositories\Eloquents\RoleEloquent;
 use App\Exceptions\MissingAttributesException;
-use App\Interfaces\RoleInterface;
 use App\Models\Role;
+use App\Repositories\Eloquents\RoleEloquent;
+use App\Services\Interfaces\RoleInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 
 class RoleService implements RoleInterface
 {
-    private RoleEloquent $roleEloquent;
 
-    public function __construct(RoleEloquent $roleEloquent)
-    {
-        $this->roleEloquent = $roleEloquent;
-    }
+    public function __construct(private readonly RoleEloquent $roleEloquent)
+    {}
 
     /**
      * @inheritDoc

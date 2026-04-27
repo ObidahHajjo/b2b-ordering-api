@@ -1,17 +1,17 @@
 <?php
 
 namespace App\Providers;
+use App\Services\Implements\RoleService;
+use App\Services\Implements\StoreService;
+use App\Services\Implements\UserService;
+use App\Services\Interfaces\RoleInterface;
+use App\Services\Interfaces\StoreInterface;
+use App\Services\Interfaces\UserInterface;
 use Illuminate\Support\ServiceProvider;
 
 // Service Interfaces
-use App\Interfaces\RoleInterface;
-use App\Interfaces\UserInterface;
-use App\Interfaces\StoreInterface;
 
 // Service classes
-use App\Services\RoleService;
-use App\Services\UserService;
-use App\Services\StoreService;
 
 
 class AppServiceProvider extends ServiceProvider
