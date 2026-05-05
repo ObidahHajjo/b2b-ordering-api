@@ -11,7 +11,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth', 'verified', 'approved'])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
@@ -19,6 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::prefix('/users')->name('users.')->controller(UserController::class)->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('/{hashId}', 'show')->name('show');
+        Route::post('/{hashId}/approve', 'approve')->name('approve')->middleware('admin');
         Route::put('/update', 'update')->name('update')->middleware('admin');
         Route::post('/', 'store')->name('store');
     });

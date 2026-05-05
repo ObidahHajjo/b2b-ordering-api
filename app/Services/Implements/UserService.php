@@ -11,11 +11,10 @@ use Illuminate\Support\Collection;
 
 class UserService implements UserInterface
 {
-    private UserEloquentInterface $userEloquent;
-
-    public function __construct(UserEloquentInterface $userEloquent)
+    public function __construct(
+        private readonly  UserEloquentInterface $userEloquent
+    )
     {
-        $this->userEloquent = $userEloquent;
     }
 
     /**

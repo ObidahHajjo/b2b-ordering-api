@@ -70,6 +70,29 @@ class AuthenticationTest extends TestCase
             'password' => 'wrong-password',
         ]);
 
+        $this->assertDatabaseHas('audit_logs', [
+            'category' => 'security',
+            'event' => 'login_failed',
+        ]);
+        $this->assertGuest();
+    }
+
+    public function test_unapproved_users_can_not_authenticate(): void
+    {
+        $user = User::factory()->withoutTwoFactor()->pendingApproval()->create();
+
+        $response = $this->from(route('login'))->post(route('login.store'), [
+            'email' => $user->email,
+            'password' => 'password',
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $response->assertSessionHasErrors('email');
+        $this->assertDatabaseHas('audit_logs', [
+            'category' => 'security',
+            'event' => 'login_blocked_pending_approval',
+            'subject_id' => $user->id,
+        ]);
         $this->assertGuest();
     }
 

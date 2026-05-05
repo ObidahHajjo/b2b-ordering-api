@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Settings;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Settings\ProfileUpdateRequest;
+use App\Models\User;
+use App\Services\AuditLogService;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,10 @@ use Inertia\Response;
 
 class ProfileController extends Controller
 {
+    public function __construct(private readonly AuditLogService $auditLogService)
+    {
+    }
+
     /**
      * Show the user's profile settings page.
      */
@@ -50,6 +56,18 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        $this->auditLogService->account(
+            'account_deleted',
+            'A user deleted their account.',
+            [
+                'user_id' => $user->id,
+                'subject_type' => User::class,
+                'subject_id' => $user->id,
+                'email' => $user->email,
+                'level' => 'warning',
+            ],
+        );
 
         Auth::logout();
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -16,7 +17,7 @@ class RegistrationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_new_users_can_register()
+    public function test_new_users_can_register_but_must_wait_for_admin_approval()
     {
         $response = $this->post(route('register.store'), [
             'name' => 'Test User',
@@ -25,7 +26,16 @@ class RegistrationTest extends TestCase
             'password_confirmation' => 'password',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $user = User::where('email', 'test@example.com')->first();
+
+        $this->assertGuest();
+        $this->assertNotNull($user);
+        $this->assertNull($user->is_active);
+        $this->assertDatabaseHas('audit_logs', [
+            'category' => 'account',
+            'event' => 'account_registered',
+            'subject_id' => $user->id,
+        ]);
+        $response->assertRedirect(route('login', absolute: false));
     }
 }

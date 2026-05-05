@@ -2,6 +2,7 @@
 
 use App\Exceptions\Handler;
 use App\Exceptions\MissingAttributesException;
+use App\Http\Middleware\EnsureUserIsApproved;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RoleMiddleware;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             'admin' => RoleMiddleware::class,
+            'approved' => EnsureUserIsApproved::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
@@ -46,4 +48,3 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
     })->create();
-
