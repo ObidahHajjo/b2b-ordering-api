@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Address extends Model
+class Categorie extends Model
 {
     /**
      * The attributes that are mass assignable.
@@ -13,19 +13,16 @@ class Address extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'city',
-        'street',
-        'number',
-        'postal_code',
+        'libelle',
     ];
 
     /**
-     * Get stores using this address.
+     * Get product classification links.
      *
-     * @return HasMany<Store> Store relations.
+     * @return HasMany<Classifie> Product classification relations.
      */
-    public function stores(): HasMany
+    public function classifications(): HasMany
     {
-        return $this->hasMany(Store::class);
+        return $this->hasMany(Classifie::class);
     }
 }
