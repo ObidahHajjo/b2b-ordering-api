@@ -18,28 +18,27 @@ class Store extends Model
         'legal_status',
         'email',
         'phone',
-        'validation_date'
+        'validation_date',
     ];
 
     /**
-     * Get the attributes that should be cast.
+     * Get store casts.
      *
-     * @return array<string, string>
+     * @return array<string, string> Cast definitions.
      */
     protected function casts(): array
     {
         return [
             'validation_date' => 'datetime',
-            'email' => 'email',
         ];
     }
 
     protected $guarded = ['id'];
 
     /**
-     * Get the users associated with this role.
+     * Get the store users.
      *
-     * @return HasMany<User>
+     * @return HasMany<User> User relation.
      */
     public function users(): HasMany
     {
@@ -47,12 +46,22 @@ class Store extends Model
     }
 
     /**
-     * Get the files associated with this store.
+     * Get the store files.
      *
-     * @return HasMany<File>
+     * @return HasMany<File> File relation.
      */
-    public function files() : HasMany
+    public function files(): HasMany
     {
         return $this->hasMany(File::class);
+    }
+
+    /**
+     * Get custom PAVs owned by this store.
+     *
+     * @return HasMany<PavCustom> Custom PAV relations.
+     */
+    public function pavsCustom(): HasMany
+    {
+        return $this->hasMany(PavCustom::class);
     }
 }

@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('legal_status');
-            $table->string("siret")->unique();
+            $table->string('siret')->unique();
             $table->string('email')->unique();
-            $table->string("phone",15)->unique();
+            $table->string('phone', 15)->unique();
             $table->timestamp('validation_date')->nullable();
             $table->timestamps();
             $table->foreignId('address_id')->nullable()->constrained('addresses');

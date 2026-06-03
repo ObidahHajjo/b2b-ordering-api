@@ -6,8 +6,14 @@ use Exception;
 
 class MissingAttributesException extends Exception
 {
-    public function __construct(array $missingAttributes){
-        parent::__construct("Missing attributes: " . implode(', ', $missingAttributes));
-
+    /**
+     * Create a missing attributes exception.
+     *
+     * @param  array<int, string>  $missingAttributes  Missing attribute names.
+     * @return void
+     */
+    public function __construct(array $missingAttributes)
+    {
+        parent::__construct('Missing attributes: '.implode(', ', $missingAttributes));
     }
 }

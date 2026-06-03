@@ -5,23 +5,27 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use App\Services\AuditLogService;
 use Closure;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class EnsureUserIsApproved
 {
-    public function __construct(private readonly AuditLogService $auditLogService)
-    {
-    }
+    /**
+     * Create the approval middleware.
+     *
+     * @param  AuditLogService  $auditLogService  Audit log service.
+     * @return void
+     */
+    public function __construct(private readonly AuditLogService $auditLogService) {}
 
     /**
-     * Handle an incoming request.
+     * Block pending users.
      *
      * @param  \Closure(Request): Response  $next
+     * @param  Request  $request  Incoming request.
+     * @return Response Next response or forbidden response.
      */
-    public function handle(Request $request, Closure $next): Response|RedirectResponse
+    public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
 
@@ -39,14 +43,9 @@ class EnsureUserIsApproved
                 ],
             );
 
-            Auth::guard('web')->logout();
-
-            $request->session()->invalidate();
-            $request->session()->regenerateToken();
-
-            return redirect()
-                ->route('login')
-                ->with('status', 'Your account is awaiting admin approval.');
+            return response()->json([
+                'message' => 'Your account is awaiting admin approval.',
+            ], Response::HTTP_FORBIDDEN);
         }
 
         return $next($request);

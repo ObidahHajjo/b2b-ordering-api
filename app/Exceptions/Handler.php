@@ -8,6 +8,13 @@ use Throwable;
 
 class Handler
 {
+    /**
+     * Render an API exception response.
+     *
+     * @param  Request  $request  Incoming request.
+     * @param  Throwable  $exception  Thrown exception.
+     * @return JsonResponse Exception response.
+     */
     public function render(Request $request, Throwable $exception): JsonResponse
     {
         if ($exception instanceof MissingAttributesException) {
@@ -16,7 +23,6 @@ class Handler
             ], 422);
         }
 
-        // Optional: fallback for other exceptions
         return response()->json([
             'message' => 'Server Error',
         ], 500);

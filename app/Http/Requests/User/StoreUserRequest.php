@@ -8,7 +8,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class StoreUserRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Allow user creation validation.
+     *
+     * @return bool Always true.
      */
     public function authorize(): bool
     {
@@ -16,9 +18,9 @@ class StoreUserRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get user creation rules.
      *
-     * @return array<string, ValidationRule|array|string>
+     * @return array<string, ValidationRule|array|string> Validation rules.
      */
     public function rules(): array
     {
@@ -34,6 +36,11 @@ class StoreUserRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get user creation messages.
+     *
+     * @return array<string, string> Validation messages.
+     */
     public function messages(): array
     {
         return [

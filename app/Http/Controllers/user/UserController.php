@@ -6,156 +6,226 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\User\StoreUserRequest;
 use App\Http\Requests\User\UpdateUserRequest;
 use App\Models\User;
-use App\Services\Implements\UserService;
-use App\Services\Interfaces\RoleInterface;
-use App\Services\Interfaces\StoreInterface;
-use Illuminate\Http\RedirectResponse;
+use App\Services\RoleService;
+use App\Services\StoreService;
+use App\Services\UserService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
-use Inertia\Inertia;
-use Inertia\Response;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Vinkla\Hashids\Facades\Hashids;
 
 class UserController extends Controller
 {
-    private UserService $userService;
-
-    public function __construct(UserService $userService)
-    {
-        $this->userService = $userService;
-    }
+    /**
+     * Create the user controller.
+     *
+     * @param  UserService  $userService  User business service.
+     * @return void
+     */
+    public function __construct(private readonly UserService $userService) {}
 
     /**
-     * Display a list of users.
+     * Display all users.
      *
-     * Each user is transformed into a lightweight DTO containing
-     * only public-facing fields and a hashed identifier.
-     *
-     * @param RoleInterface $roleInterface
-     * @param StoreInterface $storeInterface
-     * @return Response
+     * @return JsonResponse Users response.
      */
-    public function index(RoleInterface $roleInterface, StoreInterface $storeInterface): Response
+    public function index(): JsonResponse
     {
         $users = $this->userService
             ->all()
-            ->map(function (User $user) {
+            ->map(function (User $user): array {
                 return [
-                    'name' => $user->first_name . ' ' . $user->last_name,
+                    'name' => $user->first_name.' '.$user->last_name,
                     'email' => $user->email,
                     'id' => $user->hashid,
+                    'role_id' => $user->role_id,
+                    'store_id' => $user->store_id,
+                    'is_active' => $user->is_active,
                 ];
             });
 
-        $roles = $roleInterface->all()->map(function ($role) {
+        return response()->json([
+            'users' => $users,
+        ]);
+    }
+
+    /**
+     * Display all roles.
+     *
+     * @param  RoleService  $roleService  Role business service.
+     * @return JsonResponse Roles response.
+     */
+    public function roles(RoleService $roleService): JsonResponse
+    {
+        $roles = $roleService->all()->map(function ($role): array {
             return [
                 'id' => $role->id,
                 'name' => $role->name,
             ];
         });
 
-        $stores = $storeInterface->all()->map(function ($store) {
+        return response()->json([
+            'roles' => $roles,
+        ]);
+    }
+
+    /**
+     * Display all stores.
+     *
+     * @param  StoreService  $storeService  Store business service.
+     * @return JsonResponse Stores response.
+     */
+    public function stores(StoreService $storeService): JsonResponse
+    {
+        $stores = $storeService->all()->map(function ($store): array {
             return [
                 'name' => $store->name,
                 'id' => $store->id,
             ];
         });
 
-        return Inertia::render('users/index', [
-            'users' => $users,
-            'roles' => $roles,
-            'stores' => $stores
+        return response()->json([
+            'stores' => $stores,
         ]);
     }
 
     /**
-     * Display a single user's details.
+     * Display one user.
      *
-     * The user is resolved from a hashed identifier to avoid
-     * exposing internal database IDs.
-     *
-     * @param string $hashid The hashed user identifier.
-     * @return Response
-     *
-     * @throws NotFoundHttpException
+     * @param  string  $hashId  User hashed identifier.
+     * @return JsonResponse User response.
      */
-    public function show(string $hashId)
+    public function show(string $hashId): JsonResponse
     {
-        //TODO : use userService instead of model
-        $decoded = Hashids::decode($hashId);
-        $id = $decoded[0] ?? null;
-        abort_if(!$id, 404);
+        $user = $this->findByHashId($hashId);
 
-        $user = $this->userService->getById($id);
-        abort_if(!$user, 404);
-
-        return Inertia::render('users/show', [
-            'user' => [
-                'id' => $user->hashid,
-                'first_name' => $user->first_name,
-                'last_name' => $user->last_name,
-                'email' => $user->email,
-                'created_at' => $user->created_at->toDateString(),
-            ],
+        return response()->json([
+            'user' => $this->serializeUser($user),
         ]);
-
     }
 
-
     /**
-     * Create a new user.
+     * Store a new user.
      *
-     * Authorizes the action using the User policy and persists a new user
-     * with validated input data.
-     *
-     * @param StoreUserRequest $request
-     * @return RedirectResponse
-     *
+     * @param  StoreUserRequest  $request  Validated user creation request.
+     * @return JsonResponse Created user response.
      */
-    public function store(StoreUserRequest $request): RedirectResponse
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        //TODO : use userService instead of model
         $data = $request->validated();
         $data['password'] = Hash::make($data['password']);
-        User::create($data);
+        $user = $this->userService->create($data);
 
-        return redirect()->route('users.index')->with('success', 'User created.');
+        return response()->json([
+            'message' => 'User created.',
+            'user' => $this->serializeUser($user),
+        ], 201);
     }
 
     /**
-     * Update an existing user
+     * Update an existing user.
      *
-     * Authorizes the action using the User policy
-     * with validated input data.
-     *
-     * @param User $user
-     * @param \App\Http\Requests\user\UpdateUserRequest $request
-     * @return bool
-     *
+     * @param  string  $hashId  User hashed identifier.
+     * @param  UpdateUserRequest  $request  Validated user update request.
+     * @return JsonResponse Updated user response.
      */
-    public function update(User $user, UpdateUserRequest $request): bool
+    public function update(string $hashId, UpdateUserRequest $request): JsonResponse
     {
+        $user = $this->findByHashId($hashId);
         Gate::authorize('update', $user);
         $data = $request->validated();
-        return $user->update($data);
+        if (array_key_exists('password', $data)) {
+            $data['password'] = Hash::make($data['password']);
+        }
+
+        $user->update($data);
+
+        return response()->json([
+            'message' => 'User updated.',
+            'user' => $this->serializeUser($user->refresh()),
+        ]);
     }
 
     /**
-     * Delete the specified user.
+     * Delete one user.
      *
-     * Authorizes the deletion using the User policy and removes the user
-     * from persistent storage.
-     *
-     * @param User $user
-     * @return bool|null
-     *
+     * @param  string  $hashId  User hashed identifier.
+     * @return JsonResponse Deleted user response.
      */
-    public function destroy(User $user): bool|null
+    public function destroy(string $hashId): JsonResponse
     {
-        //TODO : use userService instead of model
+        $user = $this->findByHashId($hashId);
         Gate::authorize('delete', $user);
-        return $user->delete();
+        $user->delete();
+
+        return response()->json([
+            'message' => 'User deleted.',
+        ]);
     }
 
+    /**
+     * Approve one user.
+     *
+     * @param  string  $hashId  User hashed identifier.
+     * @return JsonResponse Approved user response.
+     */
+    public function approve(string $hashId): JsonResponse
+    {
+        $user = $this->findByHashId($hashId);
+        Gate::authorize('update', $user);
+
+        $user->forceFill([
+            'is_active' => now(),
+        ])->save();
+
+        $user->store?->forceFill([
+            'validation_date' => now(),
+        ])->save();
+
+        return response()->json([
+            'message' => 'User approved.',
+            'user' => $this->serializeUser($user->refresh()),
+        ]);
+    }
+
+    /**
+     * Find a user from a hash id.
+     *
+     * @param  string  $hashId  User hashed identifier.
+     * @return User Found user.
+     */
+    private function findByHashId(string $hashId): User
+    {
+        $decoded = Hashids::decode($hashId);
+        $id = $decoded[0] ?? null;
+        abort_if(! $id, 404);
+
+        $user = $this->userService->getById($id);
+        abort_if(! $user, 404);
+
+        return $user;
+    }
+
+    /**
+     * Serialize a user for API responses.
+     *
+     * @param  User  $user  User model.
+     * @return array<string, mixed> User response data.
+     */
+    private function serializeUser(User $user): array
+    {
+        return [
+            'id' => $user->hashid,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'name' => $user->name,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'role_id' => $user->role_id,
+            'store_id' => $user->store_id,
+            'is_active' => $user->is_active,
+            'created_at' => $user->created_at?->toISOString(),
+            'updated_at' => $user->updated_at?->toISOString(),
+        ];
+    }
 }

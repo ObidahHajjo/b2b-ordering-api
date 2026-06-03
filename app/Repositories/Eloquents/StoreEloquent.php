@@ -2,15 +2,17 @@
 
 namespace App\Repositories\Eloquents;
 
-use App\Repositories\Interfaces\StoreInterface;
 use App\Models\Store;
+use App\Repositories\Interfaces\StoreInterface;
 use Illuminate\Support\Collection;
 
 class StoreEloquent implements StoreInterface
 {
-
     /**
-     * @inheritDoc
+     * Get a store by id.
+     *
+     * @param  int  $id  Store id.
+     * @return Store Found store.
      */
     public function getById(int $id): Store
     {
@@ -18,7 +20,9 @@ class StoreEloquent implements StoreInterface
     }
 
     /**
-     * @inheritDoc
+     * Get all stores.
+     *
+     * @return Collection<int, Store> Store collection.
      */
     public function all(): Collection
     {
@@ -26,7 +30,10 @@ class StoreEloquent implements StoreInterface
     }
 
     /**
-     * @inheritDoc
+     * Create a store.
+     *
+     * @param  array<string, mixed>  $attributes  Store attributes.
+     * @return Store Created store.
      */
     public function create(array $attributes): Store
     {
@@ -34,18 +41,25 @@ class StoreEloquent implements StoreInterface
     }
 
     /**
-     * @inheritDoc
+     * Update a store.
+     *
+     * @param  int  $id  Store id.
+     * @param  array<string, mixed>  $attributes  Store attributes.
+     * @return bool True when updated.
      */
     public function update(int $id, array $attributes): bool
     {
-        return Store::find($id)->update($attributes);
+        return Store::findOrFail($id)->update($attributes);
     }
 
     /**
-     * @inheritDoc
+     * Delete a store.
+     *
+     * @param  int  $id  Store id.
+     * @return bool True when deleted.
      */
     public function delete(int $id): bool
     {
-        return Store::find($id)->delete();
+        return Store::findOrFail($id)->delete();
     }
 }

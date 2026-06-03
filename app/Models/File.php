@@ -16,24 +16,24 @@ class File extends Model
         'name',
         'path',
         'uploaded_at',
-        'store_id'
+        'store_id',
     ];
 
     protected $guarded = ['id'];
 
     /**
-     * Get the attributes that should be cast.
+     * Get file casts.
      *
-     * @return array<string, string>
+     * @var array<string, string>
      */
     protected $casts = [
         'uploaded_at' => 'datetime',
     ];
 
     /**
-     * Get the store associated with this file.
+     * Get the file store.
      *
-     * @return BelongsTo<Store>
+     * @return BelongsTo<Store, File> Store relation.
      */
     public function store(): BelongsTo
     {

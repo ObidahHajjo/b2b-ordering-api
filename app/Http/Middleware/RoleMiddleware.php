@@ -9,15 +9,18 @@ use Symfony\Component\HttpFoundation\Response;
 class RoleMiddleware
 {
     /**
-     * Handle an incoming request.
+     * Allow only admin users.
      *
-     * @param  \Closure(Request): (Response)  $next
+     * @param  Request  $request  Incoming request.
+     * @param  \Closure(Request): Response  $next
+     * @return Response Next response.
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if(! auth()->check() || ! auth()->user()->hasRole('admin')) {
+        if (! $request->user()?->hasRole('admin')) {
             abort(Response::HTTP_FORBIDDEN);
         }
+
         return $next($request);
     }
 }

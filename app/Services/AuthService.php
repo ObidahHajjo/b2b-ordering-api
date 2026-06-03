@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
@@ -14,12 +13,19 @@ use Laravel\Fortify\Rules\Password;
 
 class AuthService
 {
-    public function __construct(private readonly AuthRepositoryInterface $authRepository)
-    {
-    }
+    /**
+     * Create the auth service.
+     *
+     * @param  AuthRepositoryInterface  $authRepository  Auth data repository.
+     * @return void
+     */
+    public function __construct(private readonly AuthRepositoryInterface $authRepository) {}
 
     /**
-     * @param array<string, string> $input
+     * Register a new user.
+     *
+     * @param  array<string, string>  $input  Registration input.
+     * @return User Created user.
      */
     public function register(array $input): User
     {
@@ -46,6 +52,12 @@ class AuthService
         ]);
     }
 
+    /**
+     * Authenticate login credentials.
+     *
+     * @param  Request  $request  Login request.
+     * @return User|null Authenticated user when valid.
+     */
     public function authenticate(Request $request): ?User
     {
         $email = (string) $request->input(Fortify::username());
@@ -64,17 +76,11 @@ class AuthService
         return $user;
     }
 
-    public function logout(Request $request): void
-    {
-        Auth::guard('web')->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-    }
-
     /**
-     * @param array<string, string> $input
-     * @return array<string, string>
+     * Normalize registration names.
+     *
+     * @param  array<string, string>  $input  Registration input.
+     * @return array<string, string> Normalized input.
      */
     private function normalizeRegistrationInput(array $input): array
     {

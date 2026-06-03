@@ -9,16 +9,38 @@ use Throwable;
 
 class AuditLogService
 {
+    /**
+     * Write a security audit log.
+     *
+     * @param  string  $event  Audit event name.
+     * @param  string  $message  Audit message.
+     * @param  array<string, mixed>  $context  Audit context.
+     */
     public function security(string $event, string $message, array $context = []): void
     {
         $this->write('security', $event, $message, $context);
     }
 
+    /**
+     * Write an account audit log.
+     *
+     * @param  string  $event  Audit event name.
+     * @param  string  $message  Audit message.
+     * @param  array<string, mixed>  $context  Audit context.
+     */
     public function account(string $event, string $message, array $context = []): void
     {
         $this->write('account', $event, $message, $context);
     }
 
+    /**
+     * Write an audit log entry.
+     *
+     * @param  string  $category  Audit category.
+     * @param  string  $event  Audit event name.
+     * @param  string  $message  Audit message.
+     * @param  array<string, mixed>  $context  Audit context.
+     */
     public function write(string $category, string $event, string $message, array $context = []): void
     {
         try {

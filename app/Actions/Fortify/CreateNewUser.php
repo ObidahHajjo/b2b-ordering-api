@@ -8,14 +8,19 @@ use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    public function __construct(private readonly AuthService $authService)
-    {
-    }
+    /**
+     * Create the Fortify user action.
+     *
+     * @param  AuthService  $authService  Auth business service.
+     * @return void
+     */
+    public function __construct(private readonly AuthService $authService) {}
 
     /**
-     * Validate and create a newly registered user.
+     * Validate and create a user.
      *
-     * @param  array<string, string>  $input
+     * @param  array<string, string>  $input  Registration input.
+     * @return User Created user.
      */
     public function create(array $input): User
     {
