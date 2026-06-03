@@ -3,12 +3,14 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
     /**
-     * Determine whether the user can view any models.
+     * Deny listing by policy.
+     *
+     * @param  User  $user  Authenticated user.
+     * @return bool Always false.
      */
     public function viewAny(User $user): bool
     {
@@ -16,7 +18,11 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can view the model.
+     * Deny viewing by policy.
+     *
+     * @param  User  $user  Authenticated user.
+     * @param  User  $model  Target user.
+     * @return bool Always false.
      */
     public function view(User $user, User $model): bool
     {
@@ -24,7 +30,10 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can create models.
+     * Allow admins to create users.
+     *
+     * @param  User  $authUser  Authenticated user.
+     * @return bool True when admin.
      */
     public function create(User $authUser): bool
     {
@@ -32,23 +41,36 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can update the model.
+     * Allow admins or self updates.
+     *
+     * @param  User  $authUser  Authenticated user.
+     * @param  User  $targetUser  Target user.
+     * @return bool True when allowed.
      */
     public function update(User $authUser, User $targetUser): bool
     {
-        return $authUser->isAdmin();
+        return $authUser->isAdmin() || $authUser->id === $targetUser->id;
     }
 
     /**
-     * Determine whether the user can delete the model.
+     * Allow admins or self deletes.
+     *
+     * @param  User  $authUser  Authenticated user.
+     * @param  User  $targetUser  Target user.
+     * @return bool True when allowed.
      */
     public function delete(User $authUser, User $targetUser): bool
     {
-        return $authUser->isAdmin();
+        return ($authUser->isAdmin() && ! $targetUser->isAdmin())
+            || $authUser->id === $targetUser->id;
     }
 
     /**
-     * Determine whether the user can restore the model.
+     * Deny restoring users.
+     *
+     * @param  User  $user  Authenticated user.
+     * @param  User  $model  Target user.
+     * @return bool Always false.
      */
     public function restore(User $user, User $model): bool
     {
@@ -56,7 +78,11 @@ class UserPolicy
     }
 
     /**
-     * Determine whether the user can permanently delete the model.
+     * Deny force deleting users.
+     *
+     * @param  User  $user  Authenticated user.
+     * @param  User  $model  Target user.
+     * @return bool Always false.
      */
     public function forceDelete(User $user, User $model): bool
     {

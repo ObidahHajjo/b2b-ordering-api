@@ -2,79 +2,102 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\StoreInterface as StoreRepoInterface;
 use App\Exceptions\MissingAttributesException;
-use App\Interfaces\StoreInterface;
 use App\Models\Store;
+use App\Repositories\Interfaces\StoreInterface as StoreRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 
-class StoreService implements StoreInterface
+class StoreService
 {
-    private StoreRepoInterface $storeEloquent;
-
-    public function __construct(StoreRepoInterface $storeEloquent)
-    {
-        $this->storeEloquent = $storeEloquent;
-    }
+    /**
+     * Create the store service.
+     *
+     * @param  StoreRepository  $storeRepository  Store data repository.
+     * @return void
+     */
+    public function __construct(private readonly StoreRepository $storeRepository) {}
 
     /**
-     * @inheritDoc
+     * Get a store by id.
+     *
+     * @param  int  $id  Store id.
+     * @return Store|null Found store.
      */
     public function getById(int $id): ?Store
     {
-        if (empty($id)) return null;
+        if (empty($id)) {
+            return null;
+        }
 
         try {
-            return $this->storeEloquent->getById($id);
+            return $this->storeRepository->getById($id);
         } catch (ModelNotFoundException) {
             return null;
         }
     }
 
     /**
-     * @inheritDoc
+     * Get all stores.
+     *
+     * @return Collection<int, Store> Store collection.
      */
     public function all(): Collection
     {
-        return $this->storeEloquent->all();
+        return $this->storeRepository->all();
     }
 
     /**
-     * @inheritDoc
+     * Create a store.
+     *
+     * @param  array<string, mixed>  $attributes  Store attributes.
+     * @return Store Created store.
+     *
+     * @throws MissingAttributesException When required attributes are missing.
      */
     public function create(array $attributes): Store
     {
-        if (!array_key_exists('name', $attributes)) {
+        if (! array_key_exists('name', $attributes)) {
             throw new MissingAttributesException(['name']);
         }
 
-        return $this->storeEloquent->create($attributes);
+        return $this->storeRepository->create($attributes);
     }
 
     /**
-     * @inheritDoc
+     * Update a store.
+     *
+     * @param  int  $id  Store id.
+     * @param  array<string, mixed>  $attributes  Store attributes.
+     * @return bool True when updated.
      */
     public function update(int $id, array $attributes): bool
     {
-        if (empty($id)) return false;
+        if (empty($id)) {
+            return false;
+        }
 
         try {
-            return $this->storeEloquent->update($id, $attributes);
+            return $this->storeRepository->update($id, $attributes);
         } catch (ModelNotFoundException) {
             return false;
         }
     }
 
     /**
-     * @inheritDoc
+     * Delete a store.
+     *
+     * @param  int  $id  Store id.
+     * @return bool True when deleted.
      */
     public function delete(int $id): bool
     {
-        if (empty($id)) return false;
+        if (empty($id)) {
+            return false;
+        }
 
         try {
-            return $this->storeEloquent->delete($id);
+            return $this->storeRepository->delete($id);
         } catch (ModelNotFoundException) {
             return false;
         }

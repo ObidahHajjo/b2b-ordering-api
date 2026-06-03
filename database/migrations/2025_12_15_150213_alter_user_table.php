@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->renameColumn('name', 'first_name');
-            $table->string('first_name',100)->change();
+            $table->string('first_name', 100)->change();
             $table->string('last_name', 100);
             $table->string('phone', 16)->nullable();
             $table->foreignId('role_id')->nullable()->constrained('roles');

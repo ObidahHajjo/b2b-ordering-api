@@ -13,16 +13,20 @@ class Role extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'name'
+        'name',
     ];
 
     protected $guarded = [
-        'id'
+        'id',
     ];
 
+    /**
+     * Get the role users.
+     *
+     * @return HasMany<User> User relation.
+     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
-
 }

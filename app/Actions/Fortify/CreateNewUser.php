@@ -3,37 +3,27 @@
 namespace App\Actions\Fortify;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Validation\Rule;
+use App\Services\AuthService;
 use Laravel\Fortify\Contracts\CreatesNewUsers;
 
 class CreateNewUser implements CreatesNewUsers
 {
-    use PasswordValidationRules;
+    /**
+     * Create the Fortify user action.
+     *
+     * @param  AuthService  $authService  Auth business service.
+     * @return void
+     */
+    public function __construct(private readonly AuthService $authService) {}
 
     /**
-     * Validate and create a newly registered user.
+     * Validate and create a user.
      *
-     * @param  array<string, string>  $input
+     * @param  array<string, string>  $input  Registration input.
+     * @return User Created user.
      */
     public function create(array $input): User
     {
-        Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique(User::class),
-            ],
-            'password' => $this->passwordRules(),
-        ])->validate();
-
-        return User::create([
-            'name' => $input['name'],
-            'email' => $input['email'],
-            'password' => $input['password'],
-        ]);
+        return $this->authService->register($input);
     }
 }

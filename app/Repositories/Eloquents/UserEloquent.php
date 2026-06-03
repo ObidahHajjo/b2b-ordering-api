@@ -2,23 +2,28 @@
 
 namespace App\Repositories\Eloquents;
 
-use App\Repositories\Interfaces\UserInterface;
 use App\Models\User;
+use App\Repositories\Interfaces\UserInterface;
 use Illuminate\Support\Collection;
 
 class UserEloquent implements UserInterface
 {
-
     /**
-     * @inheritDoc
+     * Get a user by id.
+     *
+     * @param  int  $id  User id.
+     * @return User|null Found user.
      */
-    public function getById(int $id): User
+    public function getById(int $id): ?User
     {
-        return User::find($id);
+        return User::with(['role', 'store'])->find($id);
     }
 
     /**
-     * @inheritDoc
+     * Get a user by email.
+     *
+     * @param  string  $email  User email.
+     * @return User Found user.
      */
     public function getByEmail(string $email): User
     {
@@ -26,15 +31,20 @@ class UserEloquent implements UserInterface
     }
 
     /**
-     * @inheritDoc
+     * Get all users.
+     *
+     * @return Collection<int, User> User collection.
      */
     public function all(): Collection
     {
-        return User::all();
+        return User::with(['role', 'store'])->get();
     }
 
     /**
-     * @inheritDoc
+     * Create a user.
+     *
+     * @param  array<string, mixed>  $attributes  User attributes.
+     * @return User Created user.
      */
     public function create(array $attributes): User
     {
@@ -42,7 +52,11 @@ class UserEloquent implements UserInterface
     }
 
     /**
-     * @inheritDoc
+     * Update a user.
+     *
+     * @param  int  $id  User id.
+     * @param  array<string, mixed>  $attributes  User attributes.
+     * @return bool True when updated.
      */
     public function update(int $id, array $attributes): bool
     {
@@ -50,7 +64,10 @@ class UserEloquent implements UserInterface
     }
 
     /**
-     * @inheritDoc
+     * Delete a user.
+     *
+     * @param  int  $id  User id.
+     * @return bool True when deleted.
      */
     public function delete(int $id): bool
     {

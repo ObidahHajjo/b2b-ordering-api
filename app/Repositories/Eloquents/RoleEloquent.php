@@ -2,14 +2,17 @@
 
 namespace App\Repositories\Eloquents;
 
-use App\Repositories\Interfaces\RoleInterface;
 use App\Models\Role;
+use App\Repositories\Interfaces\RoleInterface;
 use Illuminate\Support\Collection;
 
 class RoleEloquent implements RoleInterface
 {
     /**
-     * @inheritDoc
+     * Get a role by id.
+     *
+     * @param  int  $id  Role id.
+     * @return Role Found role.
      */
     public function getById(int $id): Role
     {
@@ -17,7 +20,10 @@ class RoleEloquent implements RoleInterface
     }
 
     /**
-     * @inheritDoc
+     * Get a role by name.
+     *
+     * @param  string  $name  Role name.
+     * @return Role Found role.
      */
     public function getByName(string $name): Role
     {
@@ -25,7 +31,9 @@ class RoleEloquent implements RoleInterface
     }
 
     /**
-     * @inheritDoc
+     * Get all roles.
+     *
+     * @return Collection<int, Role> Role collection.
      */
     public function all(): Collection
     {
@@ -33,7 +41,10 @@ class RoleEloquent implements RoleInterface
     }
 
     /**
-     * @inheritDoc
+     * Create a role.
+     *
+     * @param  array<string, mixed>  $attributes  Role attributes.
+     * @return Role Created role.
      */
     public function create(array $attributes): Role
     {
@@ -41,7 +52,11 @@ class RoleEloquent implements RoleInterface
     }
 
     /**
-     * @inheritDoc
+     * Update a role.
+     *
+     * @param  int  $id  Role id.
+     * @param  array<string, mixed>  $attributes  Role attributes.
+     * @return bool True when updated.
      */
     public function update(int $id, array $attributes): bool
     {
@@ -49,7 +64,10 @@ class RoleEloquent implements RoleInterface
     }
 
     /**
-     * @inheritDoc
+     * Delete a role.
+     *
+     * @param  int  $id  Role id.
+     * @return bool True when deleted.
      */
     public function delete(int $id): bool
     {

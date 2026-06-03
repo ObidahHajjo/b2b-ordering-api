@@ -1,12 +1,11 @@
 <?php
 
-use App\Http\Middleware\HandleAppearance;
-use App\Http\Middleware\HandleInertiaRequests;
-use Illuminate\Auth\Middleware\Authenticate;
+use App\Exceptions\MissingAttributesException;
+use App\Http\Middleware\EnsureUserIsApproved;
+use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,18 +15,23 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
-
-        $middleware->web(append: [
-            HandleAppearance::class,
-            HandleInertiaRequests::class,
-            AddLinkHeadersForPreloadedAssets::class,
-        ]);
-
         $middleware->alias([
-            'admin' => \App\Http\Middleware\RoleMiddleware::class,
+            'admin' => RoleMiddleware::class,
+            'approved' => EnsureUserIsApproved::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function (MissingAttributesException $exception) {
+            $request = request(); // get the current request
+
+            if ($request->wantsJson()) {
+                return response()->json([
+                    'message' => $exception->getMessage(),
+                ], 422);
+            } else {
+                return response()->view('errors.missing_attributes', [
+                    'message' => $exception->getMessage(),
+                ], 422);
+            }
+        });
     })->create();

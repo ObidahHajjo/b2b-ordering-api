@@ -4,19 +4,22 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\traits\HasRole;
+use Database\Factories\UserFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Fortify\TwoFactorAuthenticatable;
+use Laravel\Sanctum\HasApiTokens;
 use Vinkla\Hashids\Facades\Hashids;
-
-//use Laravel\Fortify\TwoFactorAuthenticatable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable,HasRole;
+    /** @use HasFactory<UserFactory> */
+    use HasApiTokens, HasFactory, HasRole, Notifiable, TwoFactorAuthenticatable;
 
     /**
      * The attributes that are mass assignable.
@@ -24,13 +27,14 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'name',
         'last_name',
         'first_name',
         'email',
         'password',
         'phone',
         'role_id',
-        'store_id'
+        'store_id',
     ];
 
     /**
@@ -45,21 +49,84 @@ class User extends Authenticatable
 
     protected $appends = ['hashid'];
 
+    /**
+     * Get user casts.
+     *
+     * @return array<string, string> Cast definitions.
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    /**
+     * Get and set the full name.
+     *
+     * @return Attribute<string, string> Name attribute.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => trim($this->first_name.' '.$this->last_name),
+            set: function (string $value): array {
+                [$firstName, $lastName] = array_pad(preg_split('/\s+/', trim($value), 2), 2, '');
+
+                return [
+                    'first_name' => $firstName,
+                    'last_name' => $lastName,
+                ];
+            },
+        );
+    }
+
+    /**
+     * Get the user's store.
+     *
+     * @return BelongsTo<Store, User> Store relation.
+     */
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
 
+    /**
+     * Get the user's role.
+     *
+     * @return BelongsTo<Role, User> Role relation.
+     */
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);
     }
 
+    /**
+     * Get the user's address.
+     *
+     * @return HasOne<Address> Address relation.
+     */
     public function address(): HasOne
     {
         return $this->hasOne(Address::class);
     }
 
+    /**
+     * Get the user's orders links.
+     *
+     * @return HasMany<Effectue> Order link relations.
+     */
+    public function commandesEffectuees(): HasMany
+    {
+        return $this->hasMany(Effectue::class);
+    }
+
+    /**
+     * Get the public hash id.
+     *
+     * @return string Encoded user id.
+     */
     public function getHashidAttribute(): string
     {
         return Hashids::encode($this->id);

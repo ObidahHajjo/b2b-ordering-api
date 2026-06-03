@@ -7,7 +7,9 @@ use Illuminate\Foundation\Http\FormRequest;
 class UpdateUserRequest extends FormRequest
 {
     /**
-     * Determine if the user is authorized to make this request.
+     * Allow user update validation.
+     *
+     * @return bool Always true.
      */
     public function authorize(): bool
     {
@@ -15,9 +17,9 @@ class UpdateUserRequest extends FormRequest
     }
 
     /**
-     * Get the validation rules that apply to the request.
+     * Get user update rules.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string> Validation rules.
      */
     public function rules(): array
     {
