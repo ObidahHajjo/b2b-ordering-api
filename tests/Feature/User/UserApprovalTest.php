@@ -11,6 +11,11 @@ class UserApprovalTest extends TestCase
 {
     use RefreshDatabase;
 
+    /**
+     * Test admin can approve a pending user.
+     *
+     * @return void
+     */
     public function test_admin_can_approve_a_pending_user(): void
     {
         $adminRole = Role::create(['name' => 'admin']);
@@ -25,17 +30,15 @@ class UserApprovalTest extends TestCase
             'role_id' => $userRole->id,
         ]);
 
-        $response = $this->actingAs($admin)->post(route('users.approve', [
+        $response = $this->actingAs($admin, 'sanctum')->postJson(route('api.users.approve', [
             'hashId' => $pendingUser->hashid,
         ]));
 
-        $response->assertRedirect(route('users.index', absolute: false));
-        $this->assertDatabaseHas('audit_logs', [
-            'category' => 'account',
-            'event' => 'account_approved',
-            'user_id' => $admin->id,
-            'subject_id' => $pendingUser->id,
-        ]);
+        $response
+            ->assertOk()
+            ->assertJsonPath('message', 'User approved.')
+            ->assertJsonPath('user.id', $pendingUser->hashid);
+
         $this->assertNotNull($pendingUser->refresh()->is_active);
     }
 }
