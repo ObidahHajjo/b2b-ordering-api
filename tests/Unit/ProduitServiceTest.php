@@ -20,7 +20,7 @@ class ProduitServiceTest extends TestCase
     private function produitPayload(array $overrides = []): array
     {
         return array_merge([
-            'ref' => 'PDT-001',
+            'ref' => 'PDT001',
             'nom' => 'Tarte aux pommes',
             'prix' => 12.50,
             'poids' => 0.55,
